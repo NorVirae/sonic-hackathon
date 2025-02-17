@@ -1,6 +1,6 @@
 .qr-reader {
-    width: 430px;
-    height: 100vh;
+    width: auto;
+    height: 100%;
     margin: 0 auto;
     position: relative;
   }
