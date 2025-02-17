@@ -6,8 +6,10 @@ import "./QrStyles.css";
 // Qr Scanner
 import QrScanner from "qr-scanner";
 import QrFrame from "/qr-frame.svg";
+import { useNavigate } from 'react-router-dom';
 
 const QrReader = () => {
+  const navigate = useNavigate()
   // QR States
   const scanner = useRef();
   const videoEl = useRef(null);
@@ -24,6 +26,10 @@ const QrReader = () => {
     // ✅ Handle success.
     // 😎 You can do whatever you want with the scanned result.
     setScannedResult(result?.data);
+    if (result && result.data) {
+      navigate(result.data)
+    }
+
   };
 
   // Fail
@@ -81,8 +87,7 @@ const QrReader = () => {
         <img
           src={QrFrame}
           alt="Qr Frame"
-          width={256}
-          height={256}
+          
           className="qr-frame"
         />
       </div>
