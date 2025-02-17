@@ -1,7 +1,47 @@
-
-
-.app{
+.app {
   width: 100vw;
   height: 100vh;
 }
 
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  gap: 2rem;
+
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0), #ff69b4);
+  background-size: 200% 200%;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+  animation: gradientMove 3s infinite alternate ease-in-out;
+}
+
+.agent-text{
+  text-align: center;
+  font-size: .9rem;
+}
+
+.btn-scan{
+  
+}
+
+/* Gradient Animation */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
