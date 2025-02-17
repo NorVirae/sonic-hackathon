@@ -11,6 +11,7 @@ import ATMAgent from './pages/ATMAgentScreen';
 import VendAgent from './pages/VendAgentScreen';
 import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
+import CreateQRCode from './pages/CreateQRCode';
 
 
 export default function App() {
@@ -21,6 +22,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/atm" element={<ATMAgent />} />
         <Route path="/vend" element={<VendAgent />} />
+        <Route path="/create-qr" element={<CreateQRCode />} />
+
       </Routes>
       <Leva hidden={true} />
     </section>
