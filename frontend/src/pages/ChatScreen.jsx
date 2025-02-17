@@ -4,7 +4,7 @@ import { useMessagingAPI } from "../hooks/useMessage";
 import TalkLoader from "../components/loaders/TalkLoader";
 import ThinkLoader from "../components/loaders/ThinkLoader";
 
-export default function ChatScreen({ hidden, ...props }) {
+export default function ChatScreen({agentName="ATM", hidden, ...props }) {
     const input = useRef();
     const { loading, talking, messageChat } = useMessagingAPI();
     const [enableTextBox, setEnableTextBox] = useState(false)
@@ -33,7 +33,7 @@ export default function ChatScreen({ hidden, ...props }) {
         <>
             <div className="fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-between p-4 flex-col pointer-events-none">
                 <div className="self-end backdrop-blur-md bg-white bg-opacity-50 p-4 rounded-lg">
-                    <h1 className="font-black text-xl">ATM Agent</h1>
+                    <h1 className="font-black text-xl">{agentName} Agent</h1>
                 </div>
                 <div className="w-full flex flex-col items-end justify-center gap-4">
                     {loading && <div className="self-end backdrop-blur-md  bg-opacity-100 p-4 rounded-lg align-items-center">
