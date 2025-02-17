@@ -7,12 +7,14 @@ import { Leva } from 'leva';
 import { OrbitControls, Sparkles } from '@react-three/drei'
 import Portal from './components/Portal';
 import Environment from './components/Environment';
+import ChatScreen from './pages/ChatScreen';
 
 export default function App() {
 
   return (
     <section  className='app'>
       <Leva hidden={true} />
+      <ChatScreen/>
       <Canvas
       
         shadows

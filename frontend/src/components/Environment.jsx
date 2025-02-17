@@ -34,7 +34,7 @@ const Environment = ({ scale = Array.from({ length: 50 }, () => 0.5 + Math.rando
 
             {/* character */}
             <Avatar scale={1} position={[0, -0.9, 0]} rotation={[0, 0, 0]} />
-            <ContactShadows position={[0, -0.85, 0]} scale={2} opacity={0.7} />
+            <ContactShadows position={[0, -0.85, 0]} scale={2} opacity={0.3} />
 
             <Sparkles count={scale.length} position={[0, 0.9, 0]} scale={[4, 1.5, 4]} speed={0.3} />
             <Portal position={[0, -0.85, 0]} scale={2} rotation={[0, 2, 0]} />
