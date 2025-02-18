@@ -37,7 +37,7 @@ const Environment = ({ scale = Array.from({ length: 50 }, () => 0.5 + Math.rando
             <ambientLight intensity={0.4} />
 
             {/* character */}
-            {agentType == "atm" ? <ATMAvatar scale={1} position={[0, -0.9, 0]} rotation={[0, 0, 0]} /> :
+            {agentType == "atm" ? <ATMAvatar scale={1} position={[0, -0.9, 0]} rotation={[0, -0.28, 0]} /> :
                 <VendAvatar scale={1} position={[0, -0.9, 0.1]} rotation={[0, 0, 0]} />}
 
             {agentType == "atm" ? <ATM scale={1} position={[-0.1, 0, -0.5]} rotation={[0, 0, 0]} /> :
