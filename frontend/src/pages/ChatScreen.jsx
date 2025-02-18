@@ -4,7 +4,7 @@ import { useMessagingAPI } from "../hooks/useMessage";
 import TalkLoader from "../components/loaders/TalkLoader";
 import ThinkLoader from "../components/loaders/ThinkLoader";
 
-export default function ChatScreen({agentName="ATM", hidden, ...props }) {
+export default function ChatScreen({ agentName = "ATM", hidden, ...props }) {
     const input = useRef();
     const { loading, talking, messageChat } = useMessagingAPI();
     const [enableTextBox, setEnableTextBox] = useState(false)
@@ -48,7 +48,7 @@ export default function ChatScreen({agentName="ATM", hidden, ...props }) {
                         <button
                             onClick={() =>
                                 window.open(
-                                    "https://scan-testnet.assetchain.org/tx/" + transactionHash,
+                                    "https://scan-testnet.sonic.org/tx/" + transactionHash,
                                     "_blank",
                                     "noopener,noreferrer"
                                 )
