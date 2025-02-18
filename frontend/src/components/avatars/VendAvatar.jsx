@@ -6,17 +6,17 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useAnimations, useGLTF } from '@react-three/drei'
 import { button, useControls } from 'leva'
 import * as THREE from "three";
-import { facialBones, facialExpressions, gestures, validAnimations, validFacials, } from '../utils/constants';
+import { facialBones, facialExpressions, gestures, validAnimations, validFacials, } from '../../utils/constants';
 import { useFrame } from '@react-three/fiber';
-import { useMessagingAPI } from '../hooks/useMessage';
+import { useMessagingAPI } from '../../hooks/useMessage';
 
 
 // face configs
 
 
-export function Avatar(props) {
+export function VendAvatar(props) {
     const { nodes, materials, scene } = useGLTF(
-        "/models/67b2005dd6b535b191aa0afa.glb"
+        "/models/Max.glb"
     );
     const { animations } = useGLTF("/models/animations.glb");
     const group = useRef();
@@ -216,7 +216,6 @@ export function Avatar(props) {
                         ],
                         max: 1,
                         onChange: (val) => {
-                            console.log(configMode)
                             if (configMode) {
                                 console.log("CALLED")
                                 lerpMorphTarget(key, val, 1);

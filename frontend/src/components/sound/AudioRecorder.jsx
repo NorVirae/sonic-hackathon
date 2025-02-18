@@ -1,102 +1,115 @@
 import React, { useState, useEffect } from "react";
 import { RecordRTCPromisesHandler } from "recordrtc";
-
 import { FaMicrophone, FaMicrophoneAltSlash } from "react-icons/fa";
 import { useMessagingAPI } from "../../hooks/useMessage";
 
 const AudioRecorder = ({ setTransactionHash }) => {
-    const [isRecording, setIsRecording] = useState(false)
-    const [audioUrl, setAudioUrl] = useState(null)
-    let [stream, setStream] = useState(null)
-    let [recorder, setRecorder] = useState(null)
-    const [base64Webm, setBase64Webm] = useState(null)
+    const [isRecording, setIsRecording] = useState(false);
+    const [audioUrl, setAudioUrl] = useState(null);
+    const [stream, setStream] = useState(null);
+    const [recorder, setRecorder] = useState(null);
+    const [base64Webm, setBase64Webm] = useState(null);
     const { sendMessage } = useMessagingAPI();
 
-    // Helper function: Convert Blob to Base64
     const blobToBase64 = (blob) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(",")[1]); // Remove the Data URL prefix
+            reader.onloadend = () => resolve(reader.result.split(",")[1]);
             reader.onerror = (err) => reject(err);
-            reader.readAsDataURL(blob); // Read as Data URL
+            reader.readAsDataURL(blob);
         });
     };
 
+    const initializeAudio = async () => {
+        try {
+            const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log("Audio permission granted");
 
-    const innitializeAudio = async () => {
-        // Check supported MIME types and use the first available option
-        const mimeType = MediaRecorder.isTypeSupported("audio/webm")
-            ? "audio/webm"
-            : MediaRecorder.isTypeSupported("audio/ogg")
-                ? "audio/ogg"
-                : "";
+            const localRecorder = new RecordRTCPromisesHandler(localStream, {
+                type: 'audio',
+                mimeType: "audio/webm",
+            });
 
-        if (!mimeType) {
-            throw new Error("No supported MIME types available for recording.");
+            setStream(localStream);
+            setRecorder(localRecorder);
+            return { localRecorder, localStream };
+        } catch (error) {
+            console.error("Error initializing audio:", error);
+            alert("Error initializing audio: " + error);
+            return null;
         }
+    };
 
-        console.log(mimeType, "MIME")
-        let localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
-        setStream(localStream)
-        let localRecorder = new RecordRTCPromisesHandler(localStream, {
-            type: 'audio',
-            mimeType: "audio/wav"
-        });
-        setRecorder(localRecorder);
-        console.log(stream, recorder)
-    }
-
-    // Start Recording
     const startRecording = async () => {
-        console.log(recorder,
-            stream)
-
-        if (recorder && stream) {
-            setIsRecording(true)
-            recorder.startRecording();
+        try {
+            const initialized = await initializeAudio();
+            if (initialized) {
+                const { localRecorder } = initialized;
+                await localRecorder.startRecording();
+                setIsRecording(true);
+            }
+        } catch (error) {
+            console.error("Error starting recording:", error);
+            setIsRecording(false);
         }
     };
 
-    // Stop Recording
     const stopRecording = async () => {
-        if (recorder && stream) {
+        try {
+            if (!recorder) {
+                console.error("No recorder instance found");
+                return;
+            }
+
             await recorder.stopRecording();
-            setIsRecording(false)
-            let blob = await recorder.getBlob();
+            const blob = await recorder.getBlob();
+            
             const localBase64Webm = await blobToBase64(blob);
-            setBase64Webm(localBase64Webm)
-            console.log(localBase64Webm)
-            sendMessage({ audioString: localBase64Webm, textInput: null })
-            setTransactionHash(null)
+            setBase64Webm(localBase64Webm);
+            
+            await sendMessage({ audioString: localBase64Webm, textInput: null });
+            setTransactionHash(null);
 
-            // setEnableTextBox(false)
-            let audioUrla = URL.createObjectURL(blob);
-            setAudioUrl(audioUrla)
-            // invokeSaveAsDialog(blob);
+            const audioUrla = URL.createObjectURL(blob);
+            setAudioUrl(audioUrla);
+
+            // Cleanup
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            setStream(null);
+            setRecorder(null);
+        } catch (error) {
+            console.error("Error stopping recording:", error);
         }
-
     };
 
-
-
+    // Cleanup on component unmount
     useEffect(() => {
-        innitializeAudio()
-    }, [])
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [stream]);
 
+    const handleToggleRecording = async () => {
+        if (isRecording) {
+            await stopRecording();
+            setIsRecording(false);
+        } else {
+            await startRecording();
+        }
+    };
 
     return (
         <div>
-
-
             <button
-                onPointerDown={startRecording}
-                onPointerUp={stopRecording}
-                // onTouchStart={startRecording}
-                // onTouchEnd={stopRecording}
-                className={`${isRecording ? "animate-record btn-actives" : " btn-inactives"}   text-white p-6  font-semibold uppercase rounded-full`}>
+                onClick={handleToggleRecording}
+                className={`${isRecording ? "animate-record btn-actives" : "btn-inactives"} text-white p-6 font-semibold uppercase rounded-full`}
+            >
                 {isRecording ? <FaMicrophone fontSize={"30"} /> : <FaMicrophoneAltSlash fontSize={"30"} />}
             </button>
-
         </div>
     );
 };
