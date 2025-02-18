@@ -100,40 +100,32 @@ class Helper:
             print(f"Error: Failed to decode JSON. {e}")
             return None
 
-    def handleCryptoInteraction(self, action):
+    def handleAtmAction(self, action):
         print(action, "Action hasbeen Carried Out")
 
         walletOwner = os.environ["USER_1_WALLET_ADDRESS"]
         crypto_operations = SonicOperations(
-            os.environ["SONIC_TESTNET_RPC"], walletOwner, os.environ["USER_1_PRIVATE_KEY"]
+            os.environ["SONIC_TESTNET_RPC"],
+            walletOwner,
+            os.environ["USER_1_PRIVATE_KEY"],
         )
 
         match action["type"]:
+            case "dispense":
+                # fetch balance amount in atm
+                # if amount is greater than withdrawal amount
+                # call atm hardware api to dispense cash
+                # else return "unable to dispense cash"
+                return
+
             case "send":
                 result = crypto_operations.transfer_tokens(
                     self.tokens[action["token"]],
-                    self.listOfFriendsWallets[action["recipient"].lower()],
+                    self.vendorWallets[action["recipient"].lower()],
                     action["amount"],
                 )
                 return {"transactionHash": result.transactionHash.hex()}
-            case "swap":
-                result = crypto_operations.swap_tokens_uniswap_v3(
-                    self.tokens[action["tokenIn"]],
-                    self.tokens[action["tokenOut"]],
-                    action["amount"],
-                    0,
-                    self.listOfFriendsWallets[action["recipient"].lower()],
-                )
-                print(result.transactionHash.hex(), "HULA")
-                return {"transactionHash": result.transactionHash.hex()}
-            case "fetch_balance":
-                newBalance = crypto_operations.fetch_balance(
-                    self.tokens[action["token"]],
-                    self.listOfFriendsWallets[action["balancee"].lower()],
-                )
-                flooredBalance = math.floor(int(newBalance))
-                correctedBalance = f"${flooredBalance:,.0f}"
-                return {"balance": correctedBalance, "token": action["token"]}
+
             case _:
                 return
 
@@ -169,30 +161,24 @@ class Helper:
             )
             lip_sync_json_data = self.load_json_file(lip_sync_path)
             base64_audio = self.audio_to_base64(save_out_path_wav)
+
+            response_object = {
+                "message": parsed_data["response"],
+                "animation": parsed_data["interaction"]["animation"],
+                "facialExpression": parsed_data["interaction"]["facial"],
+                "audio": base64_audio,
+                "lipsync": lip_sync_json_data,
+                "action": parsed_data["action"],
+            }
             if "transactionHash" in parsed_data:
-                data_list.append(
-                    {
-                        "message": parsed_data["response"],
-                        "animation": parsed_data["interaction"]["animation"],
-                        "facialExpression": parsed_data["interaction"]["facial"],
-                        "audio": base64_audio,
-                        "lipsync": lip_sync_json_data,
-                        "action": parsed_data["action"],
-                        "transactionHash": parsed_data["transactionHash"],
-                    }
-                )
-            else:
-                data_list.append(
-                    {
-                        "message": parsed_data["response"],
-                        "animation": parsed_data["interaction"]["animation"],
-                        "facialExpression": parsed_data["interaction"]["facial"],
-                        "audio": base64_audio,
-                        "lipsync": lip_sync_json_data,
-                        "action": parsed_data["action"],
-                    }
-                )
+                response_object["transactionHash"] = parsed_data["transactionHash"]
+
+            if "atm_reciept" in parsed_data:
+                response_object["atm_reciept"] = parsed_data["atm_reciept"]
+
+            data_list.append(response_object)
             return data_list
+
         except (json.JSONDecodeError, ValueError) as e:
             # data_list = []
             print(e, "ERROR")

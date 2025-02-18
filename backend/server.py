@@ -9,14 +9,47 @@ from utilities.helpers import Helper
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/*": {"origins": os.environ["CLIENT_ORIGIN"]}})
+
+
+def handleAgentAction(
+    message, data_list, agent, helper, output_path_mp3, output_path_wav, lip_sync_path
+):
+    # Generate agent's response
+    response_message = agent.predict(message)
+
+    data_list = []
+
+    # get json data
+    parsed_data = helper.getJsonData(response_message)
+
+    # format response
+    data_list = helper.prepResponseForClient(
+        parsed_data=parsed_data,
+        agent=agent,
+        output_path_mp3=output_path_mp3,
+        output_path_wav=output_path_wav,
+        lip_sync_path=lip_sync_path,
+        data_list=data_list,
+    )
+    if parsed_data["action"]:
+        action_result = helper.handleAtmAction(parsed_data["action"])
+        data_list = handleAgentAction(
+            action_result,
+            data_list,
+            agent,
+            helper,
+            output_path_mp3,
+            output_path_wav,
+            lip_sync_path,
+        )
+    else:
+        print(data_list)
+        return data_list
 
 
 @app.route("/chat-agent", methods=["POST"])
 async def chatAgent():
-    agent = Agent()
-    helper = Helper()
-
     try:
         # Ensure request method is POST
         if request.method != "POST":
@@ -35,7 +68,28 @@ async def chatAgent():
         output_path_wav = os.environ["OUTPUT_PATH_WAV"]
 
         lip_sync_path = os.environ["LIPSYNC_PATH"]
-        input_path_webm = os.environ["INPUT_PATH_WEBM"] 
+        input_path_webm = os.environ["INPUT_PATH_WEBM"]
+
+        agent = None
+        helper = Helper()
+        if "agentType" in data and data["agentType"] is not None:
+            agentType = data["agentType"]
+            match agentType:
+                case "atm":
+                    atm_sys_info = f"{helper.loadAgent('ATM_Agent')}"
+                    agent = Agent(system_info=atm_sys_info)
+                    return
+                case "vend":
+                    atm_sys_info = f"{helper.loadAgent('Vend_Agent')}"
+                    agent = Agent(system_info=atm_sys_info)
+                    return
+
+                case __:
+                    agent = None
+                    return
+
+        if agent is None:
+            raise "Agent was not specified"
 
         # Ensure audio field exists in the request
         if "audio" in data and data["audio"] is not None:
@@ -72,7 +126,7 @@ async def chatAgent():
             data_list=data_list,
         )
         if parsed_data["action"]:
-            result = helper.handleCryptoInteraction(parsed_data["action"])
+            result = helper.handleAtmAction(parsed_data["action"])
             blockchain_response = agent.predict(f"{result}")
             block_parsed_data = helper.getJsonData(blockchain_response)
             data_list = helper.prepResponseForClient(
