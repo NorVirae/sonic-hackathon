@@ -15,10 +15,9 @@ CORS(app, resources={r"/*": {"origins": os.environ["CLIENT_ORIGIN"]}})
 def handleAgentAction(
     message, data_list, agent, helper, output_path_mp3, output_path_wav, lip_sync_path
 ):
+    data_list = data_list
     # Generate agent's response
     response_message = agent.predict(message)
-
-    data_list = []
 
     # get json data
     parsed_data = helper.getJsonData(response_message)
@@ -34,6 +33,7 @@ def handleAgentAction(
     )
     if parsed_data["action"]:
         action_result = helper.handleAtmAction(parsed_data["action"])
+        # call again if there are further actions
         data_list = handleAgentAction(
             action_result,
             data_list,
@@ -108,37 +108,16 @@ async def chatAgent():
         elif "textInput" in data:
             message = data["textInput"]
 
-        # Generate agent's response
-        response_message = agent.predict(message)
-
         data_list = []
 
-        # get json data
-        parsed_data = helper.getJsonData(response_message)
-
-        # format response
-        data_list = helper.prepResponseForClient(
-            parsed_data=parsed_data,
-            agent=agent,
-            save_out_path=output_path_mp3,
-            save_out_path_wav=output_path_wav,
-            lip_sync_path=lip_sync_path,
+        data_list = handleAgentAction(
             data_list=data_list,
+            agent=agent,
+            helper=helper,
+            output_path_mp3=output_path_mp3,
+            output_path_wav=output_path_wav,
+            lip_sync_path=lip_sync_path,
         )
-        if parsed_data["action"]:
-            result = helper.handleAtmAction(parsed_data["action"])
-            blockchain_response = agent.predict(f"{result}")
-            block_parsed_data = helper.getJsonData(blockchain_response)
-            data_list = helper.prepResponseForClient(
-                parsed_data=block_parsed_data,
-                agent=agent,
-                save_out_path=output_path_mp3,
-                save_out_path_wav=output_path_wav,
-                lip_sync_path=lip_sync_path,
-                data_list=data_list,
-            )
-            print(result)
-
         # Return the response
         return jsonify({"messages": data_list})
 

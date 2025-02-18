@@ -113,18 +113,31 @@ class Helper:
         match action["type"]:
             case "dispense":
                 # fetch balance amount in atm
+                
                 # if amount is greater than withdrawal amount
                 # call atm hardware api to dispense cash
                 # else return "unable to dispense cash"
                 return
 
             case "send":
-                result = crypto_operations.transfer_tokens(
-                    self.tokens[action["token"]],
-                    self.vendorWallets[action["recipient"].lower()],
-                    action["amount"],
-                )
-                return {"transactionHash": result.transactionHash.hex()}
+                # fetch user crypto balance
+                balance = crypto_operations.fetch_balance(self.tokens[action["token"]], action["sender"])
+
+                # if balance greater than amount to withdraw
+                if balance >= action["amount"]:
+                    result = crypto_operations.transfer_tokens(
+                        self.tokens[action["token"]],
+                        self.vendorWallets[action["recipient"].lower()],
+                        action["amount"],
+                    )
+                    return {
+                        "transactionHash": result.transactionHash.hex(),
+                        "message": "transaction Successful",
+                    }
+
+                else:
+                    # else return insufficient funds
+                    return {"transactionHash": None, "message": "Insufficient Balance"}
 
             case _:
                 return
