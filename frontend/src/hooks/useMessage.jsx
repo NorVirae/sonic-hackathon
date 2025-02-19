@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const backendUrl = import.meta.env.VITE_API_URL || "http://192.168.1.67:5000";
+const backendUrl = import.meta.env.VITE_API_URL || "https://192.168.1.67:5000";
 
 const MessageContext = createContext();
 
