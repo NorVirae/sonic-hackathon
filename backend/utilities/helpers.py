@@ -4,7 +4,9 @@ import json
 import subprocess
 from pydub import AudioSegment
 from sonic.sonic_operations import SonicOperations
-import math
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Helper:
@@ -100,6 +102,45 @@ class Helper:
             print(f"Error: Failed to decode JSON. {e}")
             return None
 
+    def handleAgentAction(
+        self,
+        message,
+        data_list,
+        agent,
+        helper,
+        output_path_mp3,
+        output_path_wav,
+        lip_sync_path,
+    ):
+        data_list = data_list
+        # Generate agent's response
+        response_message = agent.predict(message)
+
+        # get json data
+        parsed_data = helper.getJsonData(response_message)
+
+        # format response
+        data_list = helper.prepResponseForClient(
+            parsed_data=parsed_data,
+            agent=agent,
+            output_path_mp3=output_path_mp3,
+            output_path_wav=output_path_wav,
+            lip_sync_path=lip_sync_path,
+            data_list=data_list,
+        )
+        if parsed_data["action"]:
+            action_result = helper.handleAtmAction(parsed_data["action"])
+            return self.handleAgentAction(
+                action_result,
+                data_list,
+                agent,
+                helper,
+                output_path_mp3,
+                output_path_wav,
+                lip_sync_path,
+            )  # ✅ Now it always returns
+        return data_list  # ✅ Always return at the end
+
     def handleAtmAction(self, action):
         print(action, "Action hasbeen Carried Out")
 
@@ -113,15 +154,17 @@ class Helper:
         match action["type"]:
             case "dispense":
                 # fetch balance amount in atm
-                
+
                 # if amount is greater than withdrawal amount
                 # call atm hardware api to dispense cash
                 # else return "unable to dispense cash"
-                return
+                return "Cash Dispensed successfully"
 
             case "send":
                 # fetch user crypto balance
-                balance = crypto_operations.fetch_balance(self.tokens[action["token"]], action["sender"])
+                balance = crypto_operations.fetch_balance(
+                    self.tokens[action["token"]], action["sender"]
+                )
 
                 # if balance greater than amount to withdraw
                 if balance >= action["amount"]:
@@ -132,7 +175,9 @@ class Helper:
                     )
                     return {
                         "transactionHash": result.transactionHash.hex(),
-                        "message": "transaction Successful",
+                        "message": "transaction Successful, carry out withdrawal of {}".format(
+                            action["amount"]
+                        ),
                     }
 
                 else:
@@ -210,6 +255,30 @@ class Helper:
                 }
             )
             return data_list
+
+    def errorResponse(self, data_list, err):
+        # data_list = []
+        error_audio_response_path = os.environ["AI_ERROR_VOICE"]
+        error_json_lipSync_path = os.environ["AI_ERROR_LIPSYNC"]
+        print(error_audio_response_path, "CHECK")
+
+        lip_sync_json_data = self.load_json_file(
+            os.path.join(os.getcwd(), "backend", error_json_lipSync_path)
+        )
+        print(lip_sync_json_data, "HELO")
+        base64_audio = self.audio_to_base64(
+            os.path.join(os.getcwd(), "backend", error_audio_response_path)
+        )
+        data_list.append(
+            {
+                "message": str(err),
+                "animation": "Idle",
+                "facialExpression": "default",
+                "audio": base64_audio,
+                "lipsync": lip_sync_json_data,
+            }
+        )
+        return data_list
 
     def getJsonData(self, response_message):
         parsed_data = json.loads(response_message)

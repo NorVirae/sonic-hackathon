@@ -9,43 +9,12 @@ from utilities.helpers import Helper
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": os.environ["CLIENT_ORIGIN"]}})
-
-
-def handleAgentAction(
-    message, data_list, agent, helper, output_path_mp3, output_path_wav, lip_sync_path
-):
-    data_list = data_list
-    # Generate agent's response
-    response_message = agent.predict(message)
-
-    # get json data
-    parsed_data = helper.getJsonData(response_message)
-
-    # format response
-    data_list = helper.prepResponseForClient(
-        parsed_data=parsed_data,
-        agent=agent,
-        output_path_mp3=output_path_mp3,
-        output_path_wav=output_path_wav,
-        lip_sync_path=lip_sync_path,
-        data_list=data_list,
-    )
-    if parsed_data["action"]:
-        action_result = helper.handleAtmAction(parsed_data["action"])
-        # call again if there are further actions
-        data_list = handleAgentAction(
-            action_result,
-            data_list,
-            agent,
-            helper,
-            output_path_mp3,
-            output_path_wav,
-            lip_sync_path,
-        )
-    else:
-        print(data_list)
-        return data_list
+CORS(
+    app,
+    resources={
+        r"/*": {"origins": [os.environ["CLIENT_ORIGIN"], "https://192.168.1.67:5173"]}
+    },
+)
 
 
 @app.route("/chat-agent", methods=["POST"])
@@ -62,7 +31,6 @@ async def chatAgent():
             return jsonify({"error": "No JSON data provided"}), 400
 
         message = ""
-
         # Define output paths
         output_path_mp3 = os.environ["OUTPUT_PATH_MP3"]
         output_path_wav = os.environ["OUTPUT_PATH_WAV"]
@@ -78,18 +46,16 @@ async def chatAgent():
                 case "atm":
                     atm_sys_info = f"{helper.loadAgent('ATM_Agent')}"
                     agent = Agent(system_info=atm_sys_info)
-                    return
                 case "vend":
-                    atm_sys_info = f"{helper.loadAgent('Vend_Agent')}"
-                    agent = Agent(system_info=atm_sys_info)
-                    return
+                    vend_sys_info = f"{helper.loadAgent('Vend_Agent')}"
+                    agent = Agent(system_info=vend_sys_info)
 
                 case __:
                     agent = None
-                    return
+                    return jsonify({"error": "Invalid agent type"}), 400
 
         if agent is None:
-            raise "Agent was not specified"
+            raise ValueError("Agent was not specified")
 
         # Ensure audio field exists in the request
         if "audio" in data and data["audio"] is not None:
@@ -109,8 +75,10 @@ async def chatAgent():
             message = data["textInput"]
 
         data_list = []
+        print("got here")
 
-        data_list = handleAgentAction(
+        data_list = helper.handleAgentAction(
+            message=message,
             data_list=data_list,
             agent=agent,
             helper=helper,
@@ -122,8 +90,15 @@ async def chatAgent():
         return jsonify({"messages": data_list})
 
     except Exception as e:
-        print(e)
+        error_response_datalist = []
+        error_response_datalist = helper.errorResponse(error_response_datalist, e)
+        print(e, "ERROR")
+        return jsonify({"error": error_response_datalist}), 500
 
 
 if "__main__" == __name__:
-    app.run()
+    cert_path = os.path.join(os.path.dirname(__file__), "192.168.1.67.pem")
+    key_path = os.path.join(os.path.dirname(__file__), "192.168.1.67-key.pem")
+    app.run(
+        host="0.0.0.0", ssl_context=(cert_path, key_path)
+        )
