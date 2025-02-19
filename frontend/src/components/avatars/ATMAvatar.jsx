@@ -78,6 +78,7 @@ export function ATMAvatar(props) {
         setLipsync(messageChat.lipsync);
         const audio = new Audio("data:audio/mp3;base64," + messageChat.audio);
         audio.play();
+        console.log(audio)
         setAudio(audio);
         audio.onended = onMessagePlayed;
     }, [messageChat]);
