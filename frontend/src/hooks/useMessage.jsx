@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const backendUrl = import.meta.env.VITE_API_URL || "https://192.168.1.67:5000";
+const backendUrl = import.meta.env.VITE_API_URL || "https://acf8-2c0f-2a80-a46-4e10-2d57-7c4-adff-76df.ngrok-free.app";
 
 const MessageContext = createContext();
 
@@ -14,7 +14,7 @@ export const MessageProvider = ({ children }) => {
       const data = await axios({
         method: 'post',
         url: `${backendUrl}/chat-agent`,
-        data: { audio: audioString, textInput }
+        data: { audio: audioString, textInput, agentType: "atm" }
       })
       console.log(data, "DATA")
 

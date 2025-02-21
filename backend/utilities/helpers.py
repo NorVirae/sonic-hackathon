@@ -22,11 +22,13 @@ class Helper:
     def __init__(self):
         """_summary_"""
 
-    def loadAgent(agentName):
+    def loadAgent(self, agentName):
         """
         Load A Json file containin character Info
         """
-        agent_file = f"/prompts/{agentName}.json"
+        print(os.getcwd(), "GEE")
+        agent_file = os.path.join(os.getcwd(), "prompts", f"{agentName}.json")
+        print(agent_file, "AGENT")
 
         try:
             with open(agent_file, "r") as json_file:
@@ -263,11 +265,10 @@ class Helper:
         print(error_audio_response_path, "CHECK")
 
         lip_sync_json_data = self.load_json_file(
-            os.path.join(os.getcwd(), "backend", error_json_lipSync_path)
+            os.path.join(os.getcwd(), error_json_lipSync_path)
         )
-        print(lip_sync_json_data, "HELO")
         base64_audio = self.audio_to_base64(
-            os.path.join(os.getcwd(), "backend", error_audio_response_path)
+            os.path.join(os.getcwd(), error_audio_response_path)
         )
         data_list.append(
             {

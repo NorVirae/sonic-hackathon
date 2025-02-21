@@ -6,7 +6,11 @@ from langchain_core.prompts import (
     MessagesPlaceholder,
 )
 from langchain_core.messages import SystemMessage
+
+# from groq import Groq
 from groq import Groq
+
+# from langchain_groq import ChatGroq
 from langchain_groq import ChatGroq
 from langchain.chains.llm import LLMChain
 from utilities.helpers import Helper
@@ -17,25 +21,42 @@ import warnings
 
 assert numpy
 
+helper = Helper()
 
-sys_info = f"{Helper.loadAgent('ATM_Agent')}"
+# sys_info = f"{helper.loadAgent('ATM_Agent')}"
 
 
 class Agent:
     chat_history = []
+    whisper = None
+    system_prompt = None
 
-    def __init__(self, system_info=sys_info):
+    def __init__(self, system_info):
         """
         Agent Innitialization
         """
+        # print(["name"], "INFO")
         # Get Groq API key
-        groq_api_key = os.environ["GROQ_API_KEY"]
-        model = os.environ["LLM_MODEL"]
-        # Initialize Groq Langchain chat object and conversation
-        self.groq_chat = ChatGroq(groq_api_key=groq_api_key, model_name=model)
-        self.whisper = Groq(api_key=groq_api_key)
+        try:
+            groq_api_key = os.environ["GROQ_API_KEY"]
+            model = os.environ["LLM_MODEL"]
+            # Initialize Groq Langchain chat object and conversation
+            self.whisper = Groq(api_key="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")
+            print(model, groq_api_key, "GROQ===")
+            self.groq_chat = ChatGroq(
+                # groq_api_key=groq_api_key,
+                groq_api_key="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",
+                model="llama-3.3-70b-versatile",
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=2,
+            )
 
-        self.system_prompt = system_info
+            self.system_prompt = str(system_info)
+            print(self.system_prompt)
+        except Exception as e:
+            print(e, "ERRORer")
 
     def predict(self, text_input):
         # If the user has asked a question,
@@ -55,11 +76,13 @@ class Agent:
             )
 
             # Create a conversation chain using the LangChain LLM (Language Learning Model)
-            conversation = LLMChain(
-                llm=self.groq_chat,  # The Groq LangChain chat object initialized earlier.
-                prompt=prompt,  # The constructed prompt template.
-                verbose=False,  # TRUE Enables verbose output, which can be useful for debugging.
-            )
+            # conversation = LLMChain(
+            #     llm=self.groq_chat,  # The Groq LangChain chat object initialized earlier.
+            #     prompt=prompt,  # The constructed prompt template.
+            #     verbose=False,  # TRUE Enables verbose output, which can be useful for debugging.
+            # )
+
+            conversation = prompt | self.groq_chat
 
             self.chat_history.append({"role": "human", "content": text_input})
 
@@ -83,6 +106,7 @@ class Agent:
         print("Transcribing audio...", audio_path)
         # result = model.transcribe(audio_path, fp16=False)
 
+        print(self.whisper, "WHISPER")
         with open(audio_path, "rb") as file:
             transcription = self.whisper.audio.transcriptions.create(
                 file=(audio_path, file.read()),

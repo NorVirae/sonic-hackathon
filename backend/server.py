@@ -5,6 +5,7 @@ import base64
 from flask_cors import CORS
 from dotenv import load_dotenv
 from utilities.helpers import Helper
+import ssl
 
 load_dotenv()
 
@@ -32,33 +33,37 @@ async def chatAgent():
 
         message = ""
         # Define output paths
-        output_path_mp3 = os.environ["OUTPUT_PATH_MP3"]
-        output_path_wav = os.environ["OUTPUT_PATH_WAV"]
+        output_path_mp3 = os.path.join(os.getcwd(), os.environ["OUTPUT_PATH_MP3"])
+        output_path_wav = os.path.join(os.getcwd(), os.environ["OUTPUT_PATH_WAV"])
 
-        lip_sync_path = os.environ["LIPSYNC_PATH"]
-        input_path_webm = os.environ["INPUT_PATH_WEBM"]
+        lip_sync_path = os.path.join(os.getcwd(), os.environ["LIPSYNC_PATH"])
+        input_path_webm = os.path.join(os.getcwd(), os.environ["INPUT_PATH_WEBM"])
 
         agent = None
         helper = Helper()
+        system_info = None
         if "agentType" in data and data["agentType"] is not None:
             agentType = data["agentType"]
             match agentType:
                 case "atm":
-                    atm_sys_info = f"{helper.loadAgent('ATM_Agent')}"
-                    agent = Agent(system_info=atm_sys_info)
+                    atm_sys_info = helper.loadAgent("ATM_Agent")
+                    system_info = atm_sys_info
+                    print(atm_sys_info["name"], "SYS INFO")
                 case "vend":
-                    vend_sys_info = f"{helper.loadAgent('Vend_Agent')}"
-                    agent = Agent(system_info=vend_sys_info)
+                    vend_sys_info = helper.loadAgent("Vend_Agent")
+                    system_info = vend_sys_info
 
                 case __:
-                    agent = None
                     return jsonify({"error": "Invalid agent type"}), 400
-
-        if agent is None:
+                
+        if system_info is None:
             raise ValueError("Agent was not specified")
+        agent = agent = Agent(system_info=str(system_info))
 
+        # print(data, "DUTS")
         # Ensure audio field exists in the request
         if "audio" in data and data["audio"] is not None:
+            print("Got IN")
             # Extract the base64 audio data
             audio_base64 = data["audio"]
             if not audio_base64:
@@ -99,6 +104,8 @@ async def chatAgent():
 if "__main__" == __name__:
     cert_path = os.path.join(os.path.dirname(__file__), "192.168.1.67.pem")
     key_path = os.path.join(os.path.dirname(__file__), "192.168.1.67-key.pem")
-    app.run(
-        host="0.0.0.0", ssl_context=(cert_path, key_path)
-        )
+
+    # Create SSL context using ssl module instead of OpenSSL
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(cert_path, key_path)
+    app.run(host="0.0.0.0", ssl_context=context, debug=True)
