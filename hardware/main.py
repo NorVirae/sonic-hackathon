@@ -1,36 +1,54 @@
 from flask import Flask, request, jsonify
-import Adafruit_PCA9685
+import serial
+import time
+import glob
 
 app = Flask(__name__)
 
-# Initialize the PCA9685 using the default address (0x40)
-pwm = Adafruit_PCA9685.PCA9685()
+# Function to detect the Arduino serial port dynamically
+def find_arduino_port():
+    possible_ports = glob.glob("/dev/ttyACM*") + glob.glob("/dev/ttyUSB*")
+    return possible_ports[0] if possible_ports else None
 
-# Set frequency to 50hz, good for servos.
-pwm.set_pwm_freq(50)
+# Function to initialize the serial connection
+def init_serial():
+    arduino_port = find_arduino_port()
+    if arduino_port:
+        return serial.Serial(arduino_port, 9600, timeout=1)
+    return None
 
-# Servo pulse length (min and max) for 0 to 180 degrees
-SERVO_MIN = 150  # Min pulse length out of 4096
-SERVO_MAX = 600  # Max pulse length out of 4096
+# Initialize the Arduino connection
+arduino = init_serial()
 
-def set_servo_angle(channel, angle):
-    pulse = int(SERVO_MIN + (angle / 180.0) * (SERVO_MAX - SERVO_MIN))
-    pwm.set_pwm(channel, 0, pulse)
+@app.route('/control', methods=['POST'])
+def control_servo():
+    global arduino
 
-@app.route('/move_servo', methods=['POST'])
-def move_servo():
-    data = request.json
-    channel = data.get('channel')
-    angle = data.get('angle')
+    if not arduino or not arduino.is_open:
+        arduino = init_serial()
+        if not arduino:
+            return jsonify({"error": "Arduino not found"}), 500
+
+    try:
+        # Get direction, speed, and duration from request
+        data = request.json
+        direction = str(data.get("direction", ""))
+        speed = int(data.get("speed", 90))  # Default speed is 90 (stop)
+        rotate_time = int(data.get("rotate_time", 0))
+
+        if direction not in ["1", "2"] or rotate_time <= 0 or speed < 0 or speed > 180:
+            return jsonify({"error": "Invalid input"}), 400
+
+        # Send command to Arduino
+        command = f"{direction},{speed},{rotate_time}\n"
+        arduino.write(command.encode())  # Convert to bytes and send
+        arduino.flush()
+        arduino = init_serial()
+        
+        return jsonify({"status": "success", "message": f"Moving {direction} at speed {speed} for {rotate_time} ms"})
     
-    if channel is None or angle is None:
-        return jsonify({"error": "Missing channel or angle"}), 400
-    
-    if not (0 <= angle <= 180):
-        return jsonify({"error": "Angle must be between 0 and 180"}), 400
-    
-    set_servo_angle(channel, angle)
-    return jsonify({"status": "success", "channel": channel, "angle": angle})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
