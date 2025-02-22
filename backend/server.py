@@ -48,7 +48,6 @@ async def chatAgent():
                 case "atm":
                     atm_sys_info = helper.loadAgent("ATM_Agent")
                     system_info = atm_sys_info
-                    print(atm_sys_info["name"], "SYS INFO")
                 case "vend":
                     vend_sys_info = helper.loadAgent("Vend_Agent")
                     system_info = vend_sys_info
@@ -60,10 +59,8 @@ async def chatAgent():
             raise ValueError("Agent was not specified")
         agent = agent = Agent(system_info=str(system_info))
 
-        # print(data, "DUTS")
         # Ensure audio field exists in the request
         if "audio" in data and data["audio"] is not None:
-            print("Got IN")
             # Extract the base64 audio data
             audio_base64 = data["audio"]
             if not audio_base64:
@@ -80,7 +77,6 @@ async def chatAgent():
             message = data["textInput"]
 
         data_list = []
-        print("got here")
 
         data_list = helper.handleAgentAction(
             message=message,
@@ -97,7 +93,6 @@ async def chatAgent():
     except Exception as e:
         error_response_datalist = []
         error_response_datalist = helper.errorResponse(error_response_datalist, e)
-        print(e, "ERROR")
         return jsonify({"error": error_response_datalist}), 500
 
 

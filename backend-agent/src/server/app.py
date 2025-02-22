@@ -8,7 +8,7 @@ import signal
 import threading
 from pathlib import Path
 from src.cli import ZerePyCLI
-from zerepy.src.helpers.agent.helpers import Helper
+from src.helpers.agent.helper import Helper
 import os
 import base64
 
@@ -27,12 +27,9 @@ class ActionRequest(BaseModel):
 class ChatRequest(BaseModel):
     """Request model for agent actions"""
 
-    connection: str
-    action: str
     name: str
     audio: str
     prompt: str
-    params: Optional[List[str]] = []
 
 
 class ConfigureRequest(BaseModel):
@@ -180,12 +177,7 @@ class ZerePyServer:
                 raise HTTPException(status_code=400, detail="No agent loaded")
 
             try:
-                # result = await asyncio.to_thread(
-                #     self.state.cli.agent.perform_action,
-                #     connection=action_request.connection,
-                #     action=action_request.action,
-                #     params=action_request.params,
-                # )
+               
                 message = ""
                 # Define output paths
                 output_path_mp3 = os.path.join(
@@ -204,10 +196,9 @@ class ZerePyServer:
 
                 # print(data, "DUTS")
                 # Ensure audio field exists in the request
-                if "audio" in chat_request and chat_request["audio"] is not None:
-                    print("Got IN")
+                if  chat_request.audio and chat_request.audio is not None:
                     # Extract the base64 audio data
-                    audio_base64 = chat_request["audio"]
+                    audio_base64 = chat_request.audio
                     if not audio_base64:
                         raise HTTPException(
                             status_code=400, detail=str("Empty 'audio' field")
@@ -217,16 +208,21 @@ class ZerePyServer:
                     with open(input_path_webm, "wb") as f:
                         f.write(base64.b64decode(audio_base64))
 
-                        # Process the audio and generate text
-                    message = helper.generateTextFromVoice(
-                        self.state.cli.agent, input_path_webm
+                 
+
+                    message = await asyncio.to_thread(
+                        self.state.cli.agent.perform_action,
+                        connection="whisper",
+                        action="transcribe-audio",
+                        params=[input_path_webm],
                     )
 
                 elif "textInput" in chat_request:
-                    message = chat_request["prompt"]
+                    message = chat_request.prompt
+
 
                 data_list = []
-                data_list = helper.handleAgentAction(
+                data_list = await helper.handleAgentAction(
                     message=message,
                     data_list=data_list,
                     agent=self.state.cli.agent,
@@ -238,14 +234,12 @@ class ZerePyServer:
                 # result_bal = await asyncio.to_thread(
                 #     self.state.cli.agent.perform_action,
                 #     connection="sonic",
-                #     action="get-balance",
+                #     action="transcribe-audio",
                 #     params=[
                 #         "0x623787c0582026d6b13236268630Dd2c7a961BD4",
                 #         "0xAF93888cbD250300470A1618206e036E11470149",
                 #     ],
                 # )
-                print("hello")
-                print(data_list, "RSU")
 
                 # result = await self.state.cli.agent.prompt_llm(
                 #     f"balance_usdt: {result_bal}"
@@ -258,7 +252,6 @@ class ZerePyServer:
         @self.app.post("/agent/start")
         async def start_agent():
             """Start the agent loop"""
-            print(str(self.state.__dict__), "STATE")
             if not self.state.cli.agent:
                 raise HTTPException(status_code=400, detail="No agent loaded")
 

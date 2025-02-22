@@ -28,9 +28,7 @@ class Helper:
         """
         Load A Json file containin character Info
         """
-        print(os.getcwd(), "GEE")
         agent_file = os.path.join(os.getcwd(), "prompts", f"{agentName}.json")
-        print(agent_file, "AGENT")
 
         try:
             with open(agent_file, "r") as json_file:
@@ -116,41 +114,48 @@ class Helper:
         output_path_wav,
         lip_sync_path,
     ):
-        data_list = data_list
-        # Generate agent's response
-        response_message = await asyncio.to_thread(
-            agent.prompt_llm,
-            prompt=message,
-        )
+        try:
+            data_list = data_list
+            # Generate agent's response
+            response_message = await asyncio.to_thread(
+                agent.prompt_llm,
+                prompt=message,
+            )
 
-        # get json data
-        parsed_data = helper.getJsonData(response_message)
+            print("RESPONSE MESSAEGE", response_message)
 
-        # format response
-        data_list = helper.prepResponseForClient(
-            parsed_data=parsed_data,
-            agent=agent,
-            output_path_mp3=output_path_mp3,
-            output_path_wav=output_path_wav,
-            lip_sync_path=lip_sync_path,
-            data_list=data_list,
-        )
-        if parsed_data["action"]:
-            action_result = helper.handleAtmAction(parsed_data["action"], agent)
-            return self.handleAgentAction(
-                action_result,
-                data_list,
-                agent,
-                helper,
-                output_path_mp3,
-                output_path_wav,
-                lip_sync_path,
-            )  # ✅ Now it always returns
-        return data_list  # ✅ Always return at the end
+            # get json data
+            parsed_data = helper.getJsonData(response_message)
+
+            print("PARSED MESSAEGE", parsed_data)
+
+            # format response
+            data_list = helper.prepResponseForClient(
+                parsed_data=parsed_data,
+                agent=agent,
+                output_path_mp3=output_path_mp3,
+                output_path_wav=output_path_wav,
+                lip_sync_path=lip_sync_path,
+                data_list=data_list,
+            )
+
+            if parsed_data["action"]:
+                action_result = helper.handleAtmAction(parsed_data["action"], agent)
+                return self.handleAgentAction(
+                    action_result,
+                    data_list,
+                    agent,
+                    helper,
+                    output_path_mp3,
+                    output_path_wav,
+                    lip_sync_path,
+                )  # ✅ Now it always returns
+            return data_list  # ✅ Always return at the end
+
+        except Exception as e:
+            print(e, "ERROR")
 
     async def handleAtmAction(self, action, agent):
-        print(action, "Action hasbeen Carried Out")
-
         crypto_operations = agent
 
         match action["type"]:
@@ -216,21 +221,21 @@ class Helper:
         self,
         parsed_data,
         agent,
-        save_out_path,
-        save_out_path_wav,
+        output_path_mp3,
+        output_path_wav,
         lip_sync_path,
         data_list,
     ):
         try:
-            agent.generateVoice(parsed_data["response"], save_out_path)
-            self.convert_mp3_to_wav(save_out_path, save_out_path_wav)
+            self.generateVoice(parsed_data["response"], output_path_mp3)
+            self.convert_mp3_to_wav(output_path_mp3, output_path_wav)
             self.generate_lip_sync(
-                os.path.join(os.getcwd(), save_out_path_wav),
+                os.path.join(os.getcwd(), output_path_wav),
                 os.path.join(os.getcwd(), lip_sync_path),
                 "json",
             )
             lip_sync_json_data = self.load_json_file(lip_sync_path)
-            base64_audio = self.audio_to_base64(save_out_path_wav)
+            base64_audio = self.audio_to_base64(output_path_wav)
 
             response_object = {
                 "message": parsed_data["response"],
@@ -272,7 +277,6 @@ class Helper:
         # data_list = []
         error_audio_response_path = os.environ["AI_ERROR_VOICE"]
         error_json_lipSync_path = os.environ["AI_ERROR_LIPSYNC"]
-        print(error_audio_response_path, "CHECK")
 
         lip_sync_json_data = self.load_json_file(
             os.path.join(os.getcwd(), error_json_lipSync_path)
@@ -293,6 +297,8 @@ class Helper:
 
     def getJsonData(self, response_message):
         parsed_data = json.loads(response_message)
+        print("GOT HERE", parsed_data)
+
         if not isinstance(parsed_data, object):
             raise ValueError("Expected a dictionary.")
         return parsed_data
@@ -307,7 +313,6 @@ class Helper:
         print("Transcribing audio...", audio_path)
         # result = model.transcribe(audio_path, fp16=False)
 
-        print(self.whisper, "WHISPER")
         with open(audio_path, "rb") as file:
             transcription = whisper(
                 file=(audio_path, file.read()),

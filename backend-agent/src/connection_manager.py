@@ -10,17 +10,21 @@ from src.connections.twitter_connection import TwitterConnection
 from src.connections.farcaster_connection import FarcasterConnection
 from src.connections.ollama_connection import OllamaConnection
 from src.connections.echochambers_connection import EchochambersConnection
-from src.connections.solana_connection import SolanaConnection
+
+# from src.connections.solana_connection import SolanaConnection
 from src.connections.hyperbolic_connection import HyperbolicConnection
 from src.connections.galadriel_connection import GaladrielConnection
 from src.connections.sonic_connection import SonicConnection
 from src.connections.discord_connection import DiscordConnection
-from src.connections.allora_connection import AlloraConnection
+
+# from src.connections.allora_connection import AlloraConnection
 from src.connections.xai_connection import XAIConnection
 from src.connections.ethereum_connection import EthereumConnection
 from src.connections.together_connection import TogetherAIConnection
 from src.connections.evm_connection import EVMConnection
 from src.connections.perplexity_connection import PerplexityConnection
+from src.connections.whisper_connection import WhisperConnection
+
 
 logger = logging.getLogger("connection_manager")
 
@@ -51,8 +55,10 @@ class ConnectionManager:
             return EchochambersConnection
         elif class_name == "goat":
             return GoatConnection
-        elif class_name == "solana":
-            return SolanaConnection
+        elif class_name == "whisper":
+            return WhisperConnection
+        # elif class_name == "solana":
+        #     return SolanaConnection
         elif class_name == "hyperbolic":
             return HyperbolicConnection
         elif class_name == "galadriel":
@@ -61,8 +67,8 @@ class ConnectionManager:
             return SonicConnection
         elif class_name == "discord":
             return DiscordConnection
-        elif class_name == "allora":
-            return AlloraConnection
+        # elif class_name == "allora":
+        #     return AlloraConnection
         elif class_name == "xai":
             return XAIConnection
         elif class_name == "ethereum":
@@ -178,9 +184,7 @@ class ConnectionManager:
                     f"\nError: Connection '{connection_name}' is not configured"
                 )
                 return None
-            
-            for i, param in enumerate(connection.actions):
-                print(i, param)
+
 
             if action_name not in connection.actions:
                 logging.error(
@@ -189,7 +193,6 @@ class ConnectionManager:
                 return None
 
             action = connection.actions[action_name]
-            
 
             # Convert list of params to kwargs dictionary, handling both required and optional params
             kwargs = {}

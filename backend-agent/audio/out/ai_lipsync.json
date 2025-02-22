@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "soundFile": "C:\\Users\\norbe\\Documents\\Hackathons\\sonic-hackathon\\backend-agent\\audio\\out\\ai_voice.wav",
+    "duration": 2.45
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.04, "value": "X" },
+    { "start": 0.04, "end": 0.11, "value": "B" },
+    { "start": 0.11, "end": 0.18, "value": "A" },
+    { "start": 0.18, "end": 0.31, "value": "F" },
+    { "start": 0.31, "end": 0.73, "value": "B" },
+    { "start": 0.73, "end": 0.80, "value": "C" },
+    { "start": 0.80, "end": 1.29, "value": "B" },
+    { "start": 1.29, "end": 1.36, "value": "C" },
+    { "start": 1.36, "end": 1.57, "value": "B" },
+    { "start": 1.57, "end": 1.78, "value": "C" },
+    { "start": 1.78, "end": 2.13, "value": "B" },
+    { "start": 2.13, "end": 2.45, "value": "X" }
+  ]
+}

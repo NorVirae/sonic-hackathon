@@ -4,7 +4,6 @@ client = ZerePyClient("http://0.0.0.0:8000")
 
 # List available agents
 agents = client.list_agents()
-print(agents, "AGENTS")
 
 # Load an agent
 client.load_agent("example")

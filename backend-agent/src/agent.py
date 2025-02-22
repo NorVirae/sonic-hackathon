@@ -23,9 +23,7 @@ class ZerePyAgent:
 
     def __init__(self, agent_name: str):
         try:
-            print("GOTIN")
             agent_path = Path("agents") / f"{agent_name}.json"
-            print(agent_path, "FDICT")
             agent_dict = json.load(open(agent_path, "r"))
 
             missing_fields = [
@@ -103,7 +101,6 @@ class ZerePyAgent:
     def _setup_llm_provider(self):
         # Get first available LLM provider and its model
         llm_providers = self.connection_manager.get_model_providers()
-        print(llm_providers, "PROVIDERS")
         if not llm_providers:
             raise ValueError("No configured LLM provider found")
         self.model_provider = llm_providers[0]

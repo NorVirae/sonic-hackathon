@@ -42,7 +42,6 @@ class Agent:
             model = os.environ["LLM_MODEL"]
             # Initialize Groq Langchain chat object and conversation
             self.whisper = Groq(api_key="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")
-            print(model, groq_api_key, "GROQ===")
             self.groq_chat = ChatGroq(
                 # groq_api_key=groq_api_key,
                 groq_api_key="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",
@@ -54,7 +53,6 @@ class Agent:
             )
 
             self.system_prompt = str(system_info)
-            print(self.system_prompt)
         except Exception as e:
             print(e, "ERRORer")
 
@@ -91,7 +89,6 @@ class Agent:
                 chat_history=self.chat_history, human_input=text_input
             )
 
-            print("RESPONSE", response)
             self.chat_history.append({"role": "ai", "content": response})
 
             return response
@@ -106,7 +103,6 @@ class Agent:
         print("Transcribing audio...", audio_path)
         # result = model.transcribe(audio_path, fp16=False)
 
-        print(self.whisper, "WHISPER")
         with open(audio_path, "rb") as file:
             transcription = self.whisper.audio.transcriptions.create(
                 file=(audio_path, file.read()),

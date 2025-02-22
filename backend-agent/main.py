@@ -12,8 +12,8 @@ if __name__ == "__main__":
         try:
             from src.server import start_server
             start_server(host=args.host, port=args.port)
-        except ImportError:
-            print("Server dependencies not installed. Run: poetry install --extras server")
+        except ImportError as e:
+            print("Server dependencies not installed. Run: poetry install --extras server", e)
             exit(1)
     else:
         cli = ZerePyCLI()

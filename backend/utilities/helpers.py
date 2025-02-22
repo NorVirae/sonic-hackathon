@@ -26,9 +26,7 @@ class Helper:
         """
         Load A Json file containin character Info
         """
-        print(os.getcwd(), "GEE")
         agent_file = os.path.join(os.getcwd(), "prompts", f"{agentName}.json")
-        print(agent_file, "AGENT")
 
         try:
             with open(agent_file, "r") as json_file:
