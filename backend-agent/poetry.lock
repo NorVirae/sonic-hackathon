@@ -1271,6 +1271,26 @@ goat-sdk-wallet-evm = ">=0.1.0,<0.2.0"
 web3 = ">=6.20.3"
 
 [[package]]
+name = "gtts"
+version = "2.5.4"
+description = "gTTS (Google Text-to-Speech), a Python library and CLI tool to interface with Google Translate text-to-speech API"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "gTTS-2.5.4-py3-none-any.whl", hash = "sha256:5dd579377f9f5546893bc26315ab1f846933dc27a054764b168f141065ca8436"},
+    {file = "gtts-2.5.4.tar.gz", hash = "sha256:f5737b585f6442f677dbe8773424fd50697c75bdf3e36443585e30a8d48c1884"},
+]
+
+[package.dependencies]
+click = ">=7.1,<8.2"
+requests = ">=2.27,<3"
+
+[package.extras]
+docs = ["sphinx", "sphinx-autobuild", "sphinx-click", "sphinx-mdinclude", "sphinx-rtd-theme"]
+tests = ["pytest (>=7.1.3,<8.4.0)", "pytest-cov", "testfixtures"]
+
+[[package]]
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -3213,4 +3233,4 @@ server = ["fastapi", "requests", "uvicorn"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "dae14edaed9d74f769a7d39fcc0c341e285b98a470b939fdc7d63a6e93279f5b"
+content-hash = "dfad93f4b2ee8a88bddea3e02aa9ee40d994b1f9b826dc11bfb92bf8ae761c3a"

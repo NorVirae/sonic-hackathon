@@ -7,17 +7,19 @@ from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
 from elevenlabs import save
 import asyncio
+import requests
+from gtts import gTTS
 
 load_dotenv()
 
 
 class Helper:
     tokens = {
-        "USDT": os.environ["USDT_TOKEN_ADDRESS"],
+        "CORAL": os.environ["CORAL_TOKEN_ADDRESS"],
     }
 
     vendorWallets = {
-        "atm_vendor": os.environ["ATM_VENDOR"],
+        "rufus_cex": os.environ["ATM_VENDOR"],
         "vend_vendor": os.environ["VEND_VENDOR"],
     }
 
@@ -123,7 +125,7 @@ class Helper:
             )
 
             print("RESPONSE MESSAEGE", response_message)
-
+            response_message.replace("None", "null")
             # get json data
             parsed_data = helper.getJsonData(response_message)
 
@@ -140,8 +142,10 @@ class Helper:
             )
 
             if parsed_data["action"]:
-                action_result = helper.handleAtmAction(parsed_data["action"], agent)
-                return self.handleAgentAction(
+                action_result = await helper.handleAtmAction(
+                    parsed_data["action"], agent
+                )
+                return await self.handleAgentAction(
                     action_result,
                     data_list,
                     agent,
@@ -156,53 +160,71 @@ class Helper:
             print(e, "ERROR")
 
     async def handleAtmAction(self, action, agent):
-        crypto_operations = agent
+        try:
+            print("GOT IN HERE")
+            match action["type"]:
+                case "dispense":
+                    # fetch balance amount in atm
 
-        match action["type"]:
-            case "dispense":
-                # fetch balance amount in atm
-
-                # if amount is greater than withdrawal amount
-                # call atm hardware api to dispense cash
-                # else return "unable to dispense cash"
-                return "Cash Dispensed successfully"
-
-            case "send":
-                # fetch user crypto balance
-                balance = crypto_operations.fetch_balance(
-                    self.tokens[action["token"]], action["sender"]
-                )
-                wallet_owner = "0x623787c0582026d6b13236268630Dd2c7a961BD4"
-                balance = await asyncio.to_thread(
-                    agent.perform_action,
-                    connection="sonic",
-                    action="get-balance",
-                    params=[
-                        wallet_owner,
-                        self.tokens[action["token"]],
-                    ],
-                )
-
-                # if balance greater than amount to withdraw
-                if balance >= action["amount"]:
-                    result = crypto_operations.transfer_tokens(
-                        self.tokens[action["token"]],
-                        self.vendorWallets[action["recipient"].lower()],
-                        action["amount"],
-                    )
+                    # if amount is greater than withdrawal amount
+                    result = await self.dispenseATMCash("forward", action["amount"])
+                    # call atm hardware api to dispense cash
+                    # else return "unable to dispense cash"
+                    print("Dispensed Cash")
                     return {
-                        "transactionHash": result.transactionHash.hex(),
-                        "message": "transaction Successful, please dispense {} dollars to the user".format(
-                            action["amount"]
-                        ),
+                        "success": result,
+                        "message": f"Cash Dispensed {'Successfully' if result else 'Failed'}",
                     }
 
-                else:
-                    # else return insufficient funds
-                    return {"transactionHash": None, "message": "Insufficient Balance"}
+                case "send":
+                    wallet_owner = "0x623787c0582026d6b13236268630Dd2c7a961BD4"
 
-            case _:
-                return
+                    balance = await asyncio.to_thread(
+                        agent.perform_action,
+                        connection="sonic",
+                        action="get-balance",
+                        params=[
+                            wallet_owner,
+                            self.tokens[action["token"]],
+                        ],
+                    )
+
+                    # if balance greater than amount to withdraw
+                    if balance >= action["amount"]:
+                        # result = crypto_operations.transfer_tokens(
+                        #     self.tokens[action["token"]],
+                        #     self.vendorWallets[action["recipient"].lower()],
+                        #     action["amount"],
+                        # )
+
+                        result = await asyncio.to_thread(
+                            agent.perform_action,
+                            connection="sonic",
+                            action="transfer",
+                            params=[
+                                self.vendorWallets[action["recipient"].lower()],
+                                action["amount"],
+                                self.tokens[action["token"]],
+                            ],
+                        )
+                        return {
+                            "transactionHash": result.transactionHash.hex(),
+                            "message": "transaction Successful, please dispense {} dollars to the user".format(
+                                action["amount"]
+                            ),
+                        }
+
+                    else:
+                        # else return insufficient funds
+                        return {
+                            "transactionHash": None,
+                            "message": "Insufficient Balance",
+                        }
+
+                case _:
+                    return
+        except Exception as e:
+            print(e, "EROOR")
 
     def audio_to_base64(self, file_path):
         """
@@ -227,7 +249,7 @@ class Helper:
         data_list,
     ):
         try:
-            self.generateVoice(parsed_data["response"], output_path_mp3)
+            self.generateVoiceGoogle(parsed_data["response"], output_path_mp3)
             self.convert_mp3_to_wav(output_path_mp3, output_path_wav)
             self.generate_lip_sync(
                 os.path.join(os.getcwd(), output_path_wav),
@@ -322,20 +344,37 @@ class Helper:
             return transcription.text
         return "thank you"
 
-    def generateVoice(
+    def generateVoiceGoogle(
         self,
         text: str,
         audio_out_path: str = "./app/audio/out/ai_voice.mp3",
-        voice="Charlotte",
+        voice="en",
     ) -> None:
         """
-        Generates voice output using ElevenLabs API.
+        Generates voice output using Google Text to Speech.
         """
-        client = ElevenLabs(
-            api_key=os.environ["ELEVEN_LABS_API_KEY"],
+        tts = gTTS(
+            text=text,
+            lang=voice,
+            #    , tld='com.au'
         )
-        audio = client.generate(
-            text=text, voice=voice, model=os.environ["ELEVEN_LABS_MODEL"], stream=True
-        )
-        save(audio, audio_out_path)
-        return audio
+
+        tts.save(audio_out_path)
+
+        return tts
+
+    async def dispenseATMCash(self, direction: str, rotate_time: int) -> bool:
+        url = "https://suited-happily-oyster.ngrok-free.app/control"
+        payload = {"direction": direction, "rotate_time": rotate_time}
+
+        try:
+            response = requests.post(url, json=payload)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+            print(response)
+            result = True if response.json() else False
+            print(result, "RESULT")
+            return result  # Assuming the API returns JSON
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred: {http_err}")
+        except Exception as err:
+            print(f"Other error occurred: {err}")

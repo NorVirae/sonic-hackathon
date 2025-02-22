@@ -11,6 +11,7 @@ from src.cli import ZerePyCLI
 from src.helpers.agent.helper import Helper
 import os
 import base64
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("server/app")
@@ -94,6 +95,20 @@ class ServerState:
 class ZerePyServer:
     def __init__(self):
         self.app = FastAPI(title="ZerePy Server")
+        # Configure CORS
+        origins = [
+            "http://localhost:5173",  # Your frontend URL
+            "http://localhost",
+            "http://192.168.1.67:8000",  # Optionally add more origins if needed
+        ]
+
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,  # Allow these origins
+            allow_credentials=True,
+            allow_methods=["*"],  # Allow all methods
+            allow_headers=["*"],  # Allow all headers
+        )
         self.state = ServerState()
         self.setup_routes()
 
@@ -177,7 +192,6 @@ class ZerePyServer:
                 raise HTTPException(status_code=400, detail="No agent loaded")
 
             try:
-               
                 message = ""
                 # Define output paths
                 output_path_mp3 = os.path.join(
@@ -196,7 +210,7 @@ class ZerePyServer:
 
                 # print(data, "DUTS")
                 # Ensure audio field exists in the request
-                if  chat_request.audio and chat_request.audio is not None:
+                if chat_request.audio and chat_request.audio is not None:
                     # Extract the base64 audio data
                     audio_base64 = chat_request.audio
                     if not audio_base64:
@@ -208,8 +222,6 @@ class ZerePyServer:
                     with open(input_path_webm, "wb") as f:
                         f.write(base64.b64decode(audio_base64))
 
-                 
-
                     message = await asyncio.to_thread(
                         self.state.cli.agent.perform_action,
                         connection="whisper",
@@ -219,7 +231,6 @@ class ZerePyServer:
 
                 elif "textInput" in chat_request:
                     message = chat_request.prompt
-
 
                 data_list = []
                 data_list = await helper.handleAgentAction(

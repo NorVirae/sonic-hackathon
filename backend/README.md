@@ -1,1 +1,0 @@
-openssl req -x509 -newkey rsa:4096 -nodes -out 192.168.1.67.pem -keyout 192.168.1.67-key.pem -days 365 -subj "/CN=192.168.1.67"

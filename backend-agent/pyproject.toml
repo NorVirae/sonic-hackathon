@@ -28,6 +28,7 @@ fastapi = { version = "^0.109.0", optional = true }
 uvicorn = { version = "^0.27.0", optional = true }
 pydub = "^0.25.1"
 elevenlabs = "^1.51.0"
+gtts = "^2.5.4"
 
 [tool.poetry.extras]
 server = ["fastapi", "uvicorn", "requests"]
