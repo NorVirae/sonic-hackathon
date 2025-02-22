@@ -11,7 +11,7 @@ venvgit
 twitter_config.json
 
 # AGENTS
-agents/*.json
+# agents/*.json
 
 # Include example agent and general config
 !agents/example.json
