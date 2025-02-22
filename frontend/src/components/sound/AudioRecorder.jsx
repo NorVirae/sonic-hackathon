@@ -62,11 +62,14 @@ const AudioRecorder = ({ setTransactionHash }) => {
             }
 
             await recorder.stopRecording();
+            setIsRecording(false);
+
             const blob = await recorder.getBlob();
-            
+
             const localBase64Webm = await blobToBase64(blob);
             setBase64Webm(localBase64Webm);
-            
+            console.log(localBase64Webm)
+
             await sendMessage({ audioString: localBase64Webm, textInput: null });
             setTransactionHash(null);
 
@@ -96,7 +99,7 @@ const AudioRecorder = ({ setTransactionHash }) => {
     const handleToggleRecording = async () => {
         if (isRecording) {
             await stopRecording();
-            setIsRecording(false);
+            // setIsRecording(false);
         } else {
             await startRecording();
         }

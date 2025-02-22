@@ -8,7 +8,7 @@ import fs from "fs"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(),
-  basicSsl()
+  // basicSsl()
   ],
   define: {
     'process.env': {},
