@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const backendUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+const backendUrl = import.meta.env.VITE_API_URL || "https://192.168.1.67:5000";
 
 const MessageContext = createContext();
 
@@ -13,7 +13,7 @@ export const MessageProvider = ({ children }) => {
 
       const data = await axios({
         method: 'post',
-        url: `${backendUrl}/chat`,
+        url: `${backendUrl}/chat-agent`,
         data: { audio: audioString, textInput }
       })
       console.log(data, "DATA")
@@ -30,11 +30,12 @@ export const MessageProvider = ({ children }) => {
       setLoading(false);
       setTalking(false)
 
-      console.log(err)
-      const messages = err.response.messages;
-      setMessages(messages);
-
-      setMessageChat(messages[0]);
+      console.log(err, "EROR")
+      if (err.response && err.response.data && err.response.data.error) {
+        const messages = err.response.data.error;
+        setMessages(messages);
+        setMessageChat(messages[0]);
+      }
     }
 
   };
