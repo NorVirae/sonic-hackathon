@@ -87,6 +87,27 @@ Then, run:
 yarn lint
 ```
 
+### Page Routes
+/atm 
+/create-qr
+
+### To Create QR code 
+
+visit the ```/frontend/src/pages/CreateQRCode.jsx```
+under the QRCode Component
+
+```<QRCode
+        size={256}
+        style={{ height: "100%", maxWidth: "100%", width: "100%" }}
+        value={"/atm"} <== (The value contains the link to where the AI Agent is located)
+        viewBox={`0 0 1256 1256`}
+    />
+```
+
+now visit the link: http://<your-ip>:port/create-qr to get qr code
+
+
+
 ## Conclusion
 
 You now have a React project set up with Vite using Yarn. You can start building your application efficiently with fast HMR (Hot Module Replacement) and optimized performance.
