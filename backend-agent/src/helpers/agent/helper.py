@@ -3,6 +3,7 @@ import base64
 import json
 import subprocess
 from pydub import AudioSegment
+import re
 from dotenv import load_dotenv
 from elevenlabs.client import ElevenLabs
 from elevenlabs import save
@@ -145,6 +146,7 @@ class Helper:
                 action_result = await helper.handleAtmAction(
                     parsed_data["action"], agent
                 )
+                print(action_result, "ACTION RESULT")
                 return await self.handleAgentAction(
                     action_result,
                     data_list,
@@ -161,20 +163,30 @@ class Helper:
 
     async def handleAtmAction(self, action, agent):
         try:
-            print("GOT IN HERE")
             match action["type"]:
                 case "dispense":
                     # fetch balance amount in atm
-
+                    atmBalance = await self.fetchATMBalance()
+                    print(atmBalance, "ATM BALANCE", action["amount"], "AMOUNT")
                     # if amount is greater than withdrawal amount
-                    result = await self.dispenseATMCash("forward", action["amount"])
-                    # call atm hardware api to dispense cash
-                    # else return "unable to dispense cash"
-                    print("Dispensed Cash")
-                    return {
-                        "success": result,
-                        "message": f"Cash Dispensed {'Successfully' if result else 'Failed'}",
-                    }
+
+                    if atmBalance >= action["amount"]:
+                        # dispense cash
+                        result = await self.dispenseATMCash(
+                            rotate_time=action["amount"] * 1000
+                        )
+                        # call atm hardware api to dispense cash
+                        # else return "unable to dispense cash"
+                        print("Dispensed Cash")
+                        return {
+                            "success": result,
+                            "message": f"Cash Dispensed {'Successfully' if result else 'Failed'}",
+                        }
+                    else:
+                        return {
+                            "success": False,
+                            "message": "Unable to dispense cash at this time",
+                        }
 
                 case "send":
                     wallet_owner = "0x623787c0582026d6b13236268630Dd2c7a961BD4"
@@ -207,8 +219,15 @@ class Helper:
                                 self.tokens[action["token"]],
                             ],
                         )
+                        print(result, "REsu:TS AS SEEN")
+                        transactionHash = ""
+                        match = re.search(r"https?://[^\s]+", result)
+                        if match:
+                            transactionHash = match.group(0)
+                            print(transactionHash)
+
                         return {
-                            "transactionHash": result.transactionHash.hex(),
+                            "transactionHash": transactionHash,
                             "message": "transaction Successful, please dispense {} dollars to the user".format(
                                 action["amount"]
                             ),
@@ -319,7 +338,6 @@ class Helper:
 
     def getJsonData(self, response_message):
         parsed_data = json.loads(response_message)
-        print("GOT HERE", parsed_data)
 
         if not isinstance(parsed_data, object):
             raise ValueError("Expected a dictionary.")
@@ -363,9 +381,12 @@ class Helper:
 
         return tts
 
-    async def dispenseATMCash(self, direction: str, rotate_time: int) -> bool:
-        url = "https://suited-happily-oyster.ngrok-free.app/control"
-        payload = {"direction": direction, "rotate_time": rotate_time}
+    async def dispenseATMCash(
+        self, rotate_time: int, direction: str = "1", speed: int = 150
+    ) -> bool:
+        url = f"{os.environ['HARDWARE_API_ENDPOINT']}/control"
+
+        payload = {"direction": direction, "rotate_time": rotate_time, "speed": speed}
 
         try:
             response = requests.post(url, json=payload)
@@ -374,6 +395,21 @@ class Helper:
             result = True if response.json() else False
             print(result, "RESULT")
             return result  # Assuming the API returns JSON
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred: {http_err}")
+        except Exception as err:
+            print(f"Other error occurred: {err}")
+
+    async def fetchATMBalance(self) -> bool:
+        url = f"{os.environ['HARDWARE_API_ENDPOINT']}/fetch/balance"
+
+        try:
+            response = requests.post(url)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+            print(response.json())
+            result = response.json()
+            print(result, "RESULT")
+            return result["balance"]  # Assuming the API returns JSON
         except requests.exceptions.HTTPError as http_err:
             print(f"HTTP error occurred: {http_err}")
         except Exception as err:

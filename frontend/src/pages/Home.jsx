@@ -9,7 +9,7 @@ const Home = () => {
         <div className="home">
             {/* {openQr ? "Close" : "Open"}  */}
             <span className="agent-text">
-                {openQr?"Scanning...":"Scan"} For AI Agents
+                {openQr?"Scanning...":"Scan"} For ATM AI Agents
             </span>
             {openQr && <QrReader />}
             <div
