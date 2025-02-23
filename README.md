@@ -190,6 +190,9 @@ To generate a QR code linking to the ATM system:
 }
 ```
 
+##### More Info on the Hardware
+(https://github.com/NorVirae/sonic-hackathon/blob/main/README.md)
+
 ---
 
 ## Future Enhancements
