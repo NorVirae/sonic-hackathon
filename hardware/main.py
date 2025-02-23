@@ -4,7 +4,7 @@ import time
 import glob
 
 app = Flask(__name__)
-
+balance = 50
 # Function to detect the Arduino serial port dynamically
 def find_arduino_port():
     possible_ports = glob.glob("/dev/ttyACM*") + glob.glob("/dev/ttyUSB*")
@@ -20,9 +20,15 @@ def init_serial():
 # Initialize the Arduino connection
 arduino = init_serial()
 
+@app.route('/fetch/balance', methods=['POST'])
+def fetch_balance():
+    global balance
+    return jsonify({"status": "success", "balance": balance})
+
 @app.route('/control', methods=['POST'])
 def control_servo():
     global arduino
+    global balance
 
     if not arduino or not arduino.is_open:
         arduino = init_serial()
@@ -44,9 +50,10 @@ def control_servo():
         arduino.write(command.encode())  # Convert to bytes and send
         arduino.flush()
         arduino = init_serial()
-        
+        balance -= (rotate_time / 1000)
+
         return jsonify({"status": "success", "message": f"Moving {direction} at speed {speed} for {rotate_time} ms"})
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

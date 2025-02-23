@@ -242,19 +242,6 @@ class ZerePyServer:
                     output_path_wav=output_path_wav,
                     lip_sync_path=lip_sync_path,
                 )
-                # result_bal = await asyncio.to_thread(
-                #     self.state.cli.agent.perform_action,
-                #     connection="sonic",
-                #     action="transcribe-audio",
-                #     params=[
-                #         "0x623787c0582026d6b13236268630Dd2c7a961BD4",
-                #         "0xAF93888cbD250300470A1618206e036E11470149",
-                #     ],
-                # )
-
-                # result = await self.state.cli.agent.prompt_llm(
-                #     f"balance_usdt: {result_bal}"
-                # )
 
                 return {"status": "success", "messages": data_list}
             except Exception as e:

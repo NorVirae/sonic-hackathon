@@ -14,14 +14,10 @@ export default function ChatScreen({ agentName = "ATM", hidden, ...props }) {
         if (messageChat && messageChat.action) {
             setEnableTextBox(true)
         }
-        if (messageChat && messageChat.transactionHash) {
-            console.log(messageChat.transactionHash, "TransactionHash")
-            if (messageChat.transactionHash.slice(0, 2) == "0x") {
-                setTrasactionHash(messageChat.transactionHash)
-            } else {
-                setTrasactionHash("0x" + messageChat.transactionHash)
-            }
-        }
+        if (messageChat && messageChat.transactionHash)
+            setTrasactionHash(messageChat.transactionHash)
+
+
     }, [messageChat])
 
 
@@ -33,7 +29,7 @@ export default function ChatScreen({ agentName = "ATM", hidden, ...props }) {
         <>
             <div className="fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-between p-4 flex-col pointer-events-none">
                 <div className="self-end backdrop-blur-md bg-white bg-opacity-50 p-4 rounded-lg">
-                    <h1 className="font-black text-xl">{agentName} Agent</h1>
+                    <h1 className="font-black text-xl">Linda {agentName} Agent</h1>
                 </div>
                 <div className="w-full flex flex-col items-end justify-center gap-4">
                     {loading && <div className="self-end backdrop-blur-md  bg-opacity-100 p-4 rounded-lg align-items-center">
@@ -48,7 +44,7 @@ export default function ChatScreen({ agentName = "ATM", hidden, ...props }) {
                         <button
                             onClick={() =>
                                 window.open(
-                                    "https://scan-testnet.sonic.org/tx/" + transactionHash,
+                                    transactionHash,
                                     "_blank",
                                     "noopener,noreferrer"
                                 )
