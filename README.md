@@ -13,6 +13,8 @@
 ## Overview
 This system enables users to withdraw physical cash using CORAL tokens. When a user requests a withdrawal via voice input, the AI agent processes the instruction, transfers the equivalent CORAL tokens to a vendor, and triggers a Raspberry Pi-based cash dispenser to release the requested amount.
 
+![alt text](image.png)
+
 ## How It Works
 1. **Voice Input (WebM File)**
    - User provides a voice instruction (e.g., "Withdraw 5 dollars").
@@ -191,7 +193,7 @@ To generate a QR code linking to the ATM system:
 ```
 
 ##### More Info on the Hardware
-(https://github.com/NorVirae/sonic-hackathon/blob/main/README.md)
+([hardware-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/hardware/README.md))
 
 ---
 
