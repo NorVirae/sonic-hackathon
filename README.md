@@ -26,7 +26,7 @@ This system enables users to withdraw physical cash using CORAL tokens Note: we 
 
 3. **Crypto Transaction Processing**
    - The equivalent CORAL token amount is transferred to the vendor.
-   - Transactions are executed via Sonic.
+   - Transactions are executed via Sonic blockchain.
 
 4. **Cash Dispensing**
    - The AI agent calls an API linked to a Raspberry Pi.

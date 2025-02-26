@@ -1,10 +1,10 @@
-# ZerePy: AI-Powered Crypto to Cash Withdrawal
+# HardFi: Crypto to Cash Withdrawal ATM AI Agent
 
-ZerePy is an open-source Python framework that allows users to deploy AI-powered agents on X and various platforms. This modified version of ZerePy integrates with Sonic, GROQ, and Raspberry Pi to enable a seamless crypto-to-cash withdrawal process using CORAL tokens.
+This Project is Boostrapped with Zerepy (https://github.com/blorm-network/ZerePy.git), Modified to support hardware calls and Recursive conversations using Recursive function calls for hardware and blockchain calls: 
 
 ## Overview
 
-This AI Agent system allows users to withdraw physical cash in exchange for CORAL tokens. When a user requests a withdrawal via voice input, the AI agent processes the instruction, transfers the equivalent CORAL tokens to a vendor, and triggers a Raspberry Pi-based cash dispenser the user scanned to release the requested amount.
+This AI Agent system allows users to withdraw physical cash in exchange for CORAL tokens[Currently]. When a user requests a withdrawal via voice input, the AI agent processes the instruction, transfers the equivalent CORAL tokens to a vendor, and triggers a Raspberry Pi-based cash dispenser the user scanned to release the requested amount.
 
 ## How It Works
 
