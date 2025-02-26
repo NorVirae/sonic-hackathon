@@ -208,7 +208,6 @@ class ZerePyServer:
 
                 helper = Helper()
 
-                # print(data, "DUTS")
                 # Ensure audio field exists in the request
                 if chat_request.audio and chat_request.audio is not None:
                     # Extract the base64 audio data

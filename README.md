@@ -37,6 +37,10 @@ This system enables users to withdraw physical cash using CORAL tokens. When a u
 ## Backend Agent Setup
 The Backend Project is A Zerepy AI agent Boostrap
 ```git clone https://github.com/blorm-network/ZerePy.git``` to get the project
+
+##### Visit for detailed Info on the Backend-agent
+([backend-agent-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/backend-agent/README.md))
+
 ### System Requirements
 - Python 3.11+
 - Poetry 1.5+
@@ -77,8 +81,7 @@ poetry run python main.py
 ### Configuring the AI Agent
 The configuration is stored in `/backend-agent/agents/atm.json`, which contains transaction settings and ATM behavior.
 
-##### More Info on the Frontend
-([backend-agent-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/backend-agent/README.md))
+
 
 ---
 
@@ -86,6 +89,9 @@ The configuration is stored in `/backend-agent/agents/atm.json`, which contains 
 ### Prerequisites
 - Node.js (Latest LTS recommended)
 - Yarn
+
+##### Visit for detailed Info on the frontend
+([frontend-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/frontend/README.md))
 
 ### Installation
 1. **Install Yarn (if not installed):**
@@ -95,6 +101,10 @@ The configuration is stored in `/backend-agent/agents/atm.json`, which contains 
 2. **Navigate to the frontend directory:**
    ```sh
    cd frontend
+   ```
+4. **Create .env file and update with ENV VARS on /env.example**
+   ```sh
+   VITE_API_URL=<BACKEND-AGENT-API-URL>
    ```
 3. **Install dependencies:**
    ```sh
@@ -112,10 +122,12 @@ To generate a QR code linking to the ATM system:
 3. Visit `http://<your-ip>:port/create-qr` to generate a QR code.
 
 ---
-##### More Info on the Frontend
-([frontend-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/frontend/README.md))
+
 
 ## Hardware Setup
+##### visit for detailed Info on the Hardware
+([hardware-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/hardware/README.md))
+
 **Project code location:**
    ```sh
    cd hardware
@@ -201,8 +213,6 @@ To generate a QR code linking to the ATM system:
 }
 ```
 
-##### More Info on the Hardware
-([hardware-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/hardware/README.md))
 
 ---
 

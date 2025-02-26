@@ -173,7 +173,6 @@ class Helper:
                         )
                         # call atm hardware api to dispense cash
                         # else return "unable to dispense cash"
-                        print("Dispensed Cash")
                         return {
                             "success": result,
                             "message": f"Cash Dispensed {'Successfully' if result else 'Failed'}",
@@ -219,7 +218,6 @@ class Helper:
                         match = re.search(r"https?://[^\s]+", result)
                         if match:
                             transactionHash = match.group(0)
-                            print(transactionHash)
 
                         return {
                             "transactionHash": transactionHash,
@@ -238,7 +236,7 @@ class Helper:
                 case _:
                     return
         except Exception as e:
-            print(e, "EROOR")
+            print(e, "ERROR")
 
     def audio_to_base64(self, file_path):
         """
@@ -342,7 +340,6 @@ class Helper:
         Records audio, saves it to a file, and transcribes it using OpenAI Whisper.
         """
       
-        print("Transcribing audio...", audio_path)
         # result = model.transcribe(audio_path, fp16=False)
 
         with open(audio_path, "rb") as file:
@@ -398,7 +395,6 @@ class Helper:
             response = requests.post(url)
             response.raise_for_status()  # Raises an HTTPError for bad responses
             result = response.json()
-            print(result, "RESULT")
             return result["balance"]  # Assuming the API returns JSON
         except requests.exceptions.HTTPError as http_err:
             print(f"HTTP error occurred: {http_err}")

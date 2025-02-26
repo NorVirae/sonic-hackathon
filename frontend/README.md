@@ -41,13 +41,19 @@ Replace `my-app` with your preferred project name.
 cd frontend
 ```
 
-### 4. Install Dependencies
+### 4. Create .env file and update with ENV VARS on /env.example
+
+```sh
+VITE_API_URL=<BACKEND-AGENT-API-URL>
+```
+
+### 5. Install Dependencies
 
 ```sh
 yarn install
 ```
 
-### 5. Start the Development Server
+### 6. Start the Development Server
 
 ```sh
 yarn dev
