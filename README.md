@@ -1,4 +1,4 @@
-# HARDFI: Crypto to Cash Withdrawal ATM AI Agent
+# HARDFI: 3D Interactive Crypto to Cash Withdrawal ATM AI Agent
 ## Table of Contents
 - [Overview](#overview)
 - [How It Works](#how-it-works)
@@ -221,6 +221,7 @@ To generate a QR code linking to the ATM system:
 ---
 
 ## Future Enhancements
+- Lightening Fast Interactions by hosting Live servers
 - Multi-currency support
 - Biometric authentication
 - AI-powered fraud detection
