@@ -11,7 +11,7 @@
 ---
 
 ## Overview
-This system enables users to withdraw physical cash using CORAL tokens. When a user requests a withdrawal via voice input, the AI agent processes the instruction, transfers the equivalent CORAL tokens to a vendor, and triggers a Raspberry Pi-based cash dispenser to release the requested amount.
+This system enables users to withdraw physical cash using CORAL tokens Note: we are working on supporting mutltiple tokens in the future. When a user requests a withdrawal via voice input, the AI agent processes the instruction, transfers the equivalent CORAL tokens to a vendor, and triggers a Raspberry Pi-based cash dispenser to release the requested amount.
 
 ![alt text](image.png)
 
