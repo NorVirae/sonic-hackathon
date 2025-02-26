@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const backendUrl = import.meta.env.VITE_API_URL || "https://c341-105-112-221-138.ngrok-free.app";
+const backendUrl = import.meta.env.VITE_API_URL || "https://7a6a-2c0f-2a80-a46-4e10-475-95b0-4b35-31bb.ngrok-free.app";
 
 const MessageContext = createContext();
 

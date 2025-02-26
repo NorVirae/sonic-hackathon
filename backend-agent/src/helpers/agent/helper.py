@@ -56,7 +56,7 @@ class Helper:
         except Exception as e:
             print(f"Error during conversion: {e}")
 
-    def generate_lip_sync(self, audio_path, output_path, output_format="json"):
+    def generate_lip_sync(self, audio_path: str, output_path: str, output_format="json"):
         """
         Generate lip sync data from an audio file using Rhubarb.
 
@@ -125,12 +125,10 @@ class Helper:
                 prompt=message,
             )
 
-            print("RESPONSE MESSAEGE", response_message)
             response_message.replace("None", "null")
             # get json data
             parsed_data = helper.getJsonData(response_message)
 
-            print("PARSED MESSAEGE", parsed_data)
 
             # format response
             data_list = helper.prepResponseForClient(
@@ -146,7 +144,6 @@ class Helper:
                 action_result = await helper.handleAtmAction(
                     parsed_data["action"], agent
                 )
-                print(action_result, "ACTION RESULT")
                 return await self.handleAgentAction(
                     action_result,
                     data_list,
@@ -167,7 +164,6 @@ class Helper:
                 case "dispense":
                     # fetch balance amount in atm
                     atmBalance = await self.fetchATMBalance()
-                    print(atmBalance, "ATM BALANCE", action["amount"], "AMOUNT")
                     # if amount is greater than withdrawal amount
 
                     if atmBalance >= action["amount"]:
@@ -219,7 +215,6 @@ class Helper:
                                 self.tokens[action["token"]],
                             ],
                         )
-                        print(result, "REsu:TS AS SEEN")
                         transactionHash = ""
                         match = re.search(r"https?://[^\s]+", result)
                         if match:
@@ -297,7 +292,6 @@ class Helper:
 
         except (json.JSONDecodeError, ValueError) as e:
             # data_list = []
-            print(e, "ERROR")
             error_audio_response_path = os.environ["AI_ERROR_VOICE"]
             error_json_lipSync_path = os.environ["AI_ERROR_LIPSYNC"]
 
@@ -347,9 +341,7 @@ class Helper:
         """
         Records audio, saves it to a file, and transcribes it using OpenAI Whisper.
         """
-        print("Loading Whisper model...")
-        # model = whisper.load_model("turbo")
-
+      
         print("Transcribing audio...", audio_path)
         # result = model.transcribe(audio_path, fp16=False)
 
@@ -374,6 +366,7 @@ class Helper:
         tts = gTTS(
             text=text,
             lang=voice,
+            
             #    , tld='com.au'
         )
 
@@ -391,9 +384,7 @@ class Helper:
         try:
             response = requests.post(url, json=payload)
             response.raise_for_status()  # Raises an HTTPError for bad responses
-            print(response)
             result = True if response.json() else False
-            print(result, "RESULT")
             return result  # Assuming the API returns JSON
         except requests.exceptions.HTTPError as http_err:
             print(f"HTTP error occurred: {http_err}")
@@ -406,7 +397,6 @@ class Helper:
         try:
             response = requests.post(url)
             response.raise_for_status()  # Raises an HTTPError for bad responses
-            print(response.json())
             result = response.json()
             print(result, "RESULT")
             return result["balance"]  # Assuming the API returns JSON

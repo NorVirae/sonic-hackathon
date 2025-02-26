@@ -43,8 +43,6 @@ class ZerePyAgent:
             self.use_time_based_weights = agent_dict["use_time_based_weights"]
             self.time_based_multipliers = agent_dict["time_based_multipliers"]
 
-            # print(self.connection_manager.__dict__, "CINNECTON")
-
             has_twitter_tasks = any(
                 "tweet" in task["name"] for task in agent_dict.get("tasks", [])
             )

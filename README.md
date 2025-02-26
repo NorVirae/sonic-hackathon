@@ -77,6 +77,9 @@ poetry run python main.py
 ### Configuring the AI Agent
 The configuration is stored in `/backend-agent/agents/atm.json`, which contains transaction settings and ATM behavior.
 
+##### More Info on the Frontend
+([backend-agent-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/backend-agent/README.md))
+
 ---
 
 ## Frontend Setup
@@ -109,8 +112,14 @@ To generate a QR code linking to the ATM system:
 3. Visit `http://<your-ip>:port/create-qr` to generate a QR code.
 
 ---
+##### More Info on the Frontend
+([frontend-docs](https://github.com/NorVirae/sonic-hackathon/blob/main/frontend/README.md))
 
 ## Hardware Setup
+**Project code location:**
+   ```sh
+   cd hardware
+   ```
 ### Components
 - **Raspberry Pi Zero 2W:** Runs a Flask server and processes transactions.
 - **Arduino Uno:** Controls servos for dispensing cash.
