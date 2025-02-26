@@ -1,6 +1,6 @@
 # HardFi: Crypto to Cash Withdrawal ATM AI Agent
 
-This Project is Boostrapped with Zerepy (https://github.com/blorm-network/ZerePy.git), Modified to support hardware calls and Recursive conversations using Recursive function calls for hardware and blockchain calls: 
+This Project is Boostrapped with Zerepy (https://github.com/blorm-network/ZerePy.git), Modified to support hardware calls and Recursive conversations using Recursive function calls for hardware and blockchain calls.
 
 ## Overview
 
@@ -46,7 +46,7 @@ Ensure the following environment variables are properly configured:
 2. Clone the repository:
 
    ```bash
-   git clone https://github.com/blorm-network/ZerePy.git
+   git clone https://github.com/NorVirae/sonic-hackathon.git
    ```
 
 3. Navigate to the directory:
@@ -141,7 +141,7 @@ The frontend communicates with the AI agent using the following API route:
 }
 ```
 
-### Cash Dispensing API (Raspberry Pi)
+### Cash Dispensing API (Raspberry Pi) RPC calls
 
 #### Endpoint: `/dispense`
 - **Method:** `POST`
@@ -167,6 +167,7 @@ The frontend communicates with the AI agent using the following API route:
 This modified version of ZerePy allows users to withdraw physical cash using CORAL tokens. By integrating Sonic for transaction execution, GROQ for voice processing, and Raspberry Pi for cash dispensing, the system ensures a seamless and efficient crypto-to-cash withdrawal experience.
 
 ## Future Enhancements
+- Lightening Fast Interactions by hosting Live servers
 - Multi-currency support for withdrawals
 - Biometric authentication for added security
 - AI-powered fraud detection mechanisms
