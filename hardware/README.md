@@ -1,5 +1,8 @@
 # HARDFI Hardware Documentation
-
+**Project code location:**
+   ```sh
+   cd hardware
+   ```
 ## Overview
 Hard FI crypto ATM system consists of a Raspberry Pi Zero 2W, an Arduino Uno, and two 360-degree servos. The system facilitates crypto withdrawals by converting digital currency transactions into physical cash dispensing. The Raspberry Pi Zero 2W manages transaction processing and communicates with the Arduino Uno, which controls servo motors responsible for dispensing cash.
 
