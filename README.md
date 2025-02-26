@@ -15,6 +15,10 @@ This system enables users to withdraw physical cash using CORAL tokens Note: we 
 
 ![alt text](image.png)
 
+## Demo Video
+[![Watch the video](https://img.youtube.com/vi/YQTuKQv2V7s/0.jpg)](https://www.youtube.com/watch?v=YQTuKQv2V7s)
+
+
 ## How It Works
 1. **Voice Input (WebM File)**
    - User provides a voice instruction (e.g., "Withdraw 5 dollars").
